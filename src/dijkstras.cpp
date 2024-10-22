@@ -88,6 +88,7 @@ void store_map(maze &m){
     int num;
     cin >> num;
     m.tiles.resize(num, nullptr);
+    m.visited.resize(num, -1);
 
     for(int i = 0; i < num; i++){
         char a;
