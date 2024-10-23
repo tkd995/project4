@@ -13,10 +13,11 @@ using namespace std;
 
 struct maze{
     map<char, int> costs;
-    vector<int*> tiles;
+    vector<int> tiles;
     int start, end;
     int row, col;
     vector<signed int> visited;
+    vector<string> path;
 };
 
 void generate_map(int n){
@@ -55,11 +56,11 @@ void generate_map(int n){
 }
 
 void dikstras(maze &m, int start, int distance){
-
-    if(start == m.end){//exit condition
+   // cout<<start<<endl;
+    if(start == m.end || (m.visited[start] <= distance && m.visited[start] != -1)){//exit condition
         return;
     }
-    distance += *(m.tiles[start]);//progress for recursive pass
+    distance += (m.tiles[start]);//progress for recursive pass
 
     if(m.visited[start] != -1){//change block
         if(m.visited[start] > distance){
@@ -70,25 +71,32 @@ void dikstras(maze &m, int start, int distance){
         m.visited[start] = distance;
     }
 
+    map<int, int> min_heap;
+
     if(start != 0){//left
-        dikstras(m, start-1, distance);
+        min_heap.emplace(start-1, distance);
     }
     if(start != m.col*m.row - 1){//right
-        dikstras(m, start+1, distance);
+        min_heap.emplace(start+1, distance);
     }
     if(start/m.col != 0){//up
-        dikstras(m, start-m.col, distance);
+        min_heap.emplace(start-m.col, distance);
     }
     if(start/m.col != m.row){//down
-        dikstras(m, start+m.col, distance);
+        min_heap.emplace(start+m.col, distance);
     }
+
+    for(auto i = min_heap.begin(); i!= min_heap.end(); ++i){
+	m.path.push_back(to_string(start) + " " + to_string(i->first));
+	dikstras(m, i->first, distance);
+    	m.path.pop_back();
+    }
+
 }
 
 void store_map(maze &m){
     int num;
     cin >> num;
-    m.tiles.resize(num, nullptr);
-    m.visited.resize(num, -1);
 
     for(int i = 0; i < num; i++){
         char a;
@@ -100,16 +108,18 @@ void store_map(maze &m){
 
     int row, col;
     cin >> row >> col;
+    m.tiles = vector<int>(col*row, 0);
+
     for(int k = 0; k < col; k++){
         for(int j = 0; j < row; j++){
             char c;
             cin >> c;
 
-            m.tiles[j*row+k] = &m.costs[c];
+            m.tiles[j*row+k] = m.costs[c];
         }
     }
-    vector<signed int> visited = vector<signed int>(row*col, -1);
-    
+    m.visited = vector<signed int>(row*col, -1);
+
     int tx, ty;
     cin >> tx >> ty;
     m.start = tx*row+ty;
@@ -126,7 +136,12 @@ void store_map(maze &m){
 int main(int argc, char *argv[]) {
     maze* m = new maze;
     store_map(*m);
+    cout<<"stored map"<<endl;
     dikstras(*m, m->start, 0);
+
+    for(int i = 0; i < (int)m->path.size(); i++){
+	cout<<m->path[i]<<endl;
+    }
 
     return 0;
 }
