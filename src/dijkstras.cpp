@@ -22,41 +22,6 @@ struct maze{
     int path_length;
 };
 
-void generate_map(int n){
-
-    default_random_engine gen;//random number generators for new game creation
-    uniform_int_distribution<int> dista(97, 122);
-    uniform_int_distribution<int> distb(1, n+1);
-    uniform_int_distribution<int> distc(0, n);
-
-    cout << n/2 << endl;
-    vector<int> g(n, 0);
-    for(int i = 0; i < n/2; i++){
-        int choc = dista(gen);//random letters
-        if(find(g.begin(), g.end(), choc) == g.end()){
-            cout << i << " " << distb(gen) << endl;
-            g[i] = choc;
-        }
-    }
-
-    cout << n << " " << n;
-
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < n; j++){
-            int b = g[distc(gen)];
-            while(!b){
-                b = g[distc(gen)];
-            }
-            cout << (char)b << " ";
-        }
-        cout << endl;
-    }
-
-    cout << "0 0" << endl;
-    cout << n << " " << n << endl;
-    return;
-}
-
 void dikstras(maze &m){
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
     m.visited[m.start] = 0;
@@ -76,7 +41,7 @@ void dikstras(maze &m){
         }
 
         vector<int> directions;
-        
+
         if(position%m.col != m.col-1){
             directions.push_back(1);
         }
